@@ -1,6 +1,7 @@
 import 'package:domitoscoresheetapp/components/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -40,49 +41,40 @@ class _HomePageState extends State<HomePage> {
 
   // alerts
   void _showAlert(BuildContext context) {
-    showDialog(
+    showPlatformDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => PlatformAlertDialog(
               content: Text('Y los puntos pa\' cuando?'),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(
-                    'Mala mia..',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                PlatformDialogAction(
+                  child: PlatformText('Mala mia..'),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ],
             ));
   }
 
   void _anunceWinner(BuildContext context) {
-    showDialog(
+    showPlatformDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => PlatformAlertDialog(
               content: Text(
                 '${_totalThem > _totalUs ? 'Ganaron Ellos 😭' : 'Ganamos Nostros 😁!'}',
-                textAlign: TextAlign.center,
               ),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(
-                    'Juego Nuevo',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.lightGreen),
+                PlatformDialogAction(
+                  child: PlatformText(
+                    'Juevo Nuevo',
+                    style: TextStyle(color: Colors.lightBlue),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
                     _resetEverything();
                   },
                 ),
-                FlatButton(
-                  child: Text(
+                PlatformDialogAction(
+                  child: PlatformText(
                     'Cerrar',
-                    textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.red),
                   ),
                   onPressed: () {
@@ -94,29 +86,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _askConfirmation(BuildContext context) {
-    showDialog(
+    showPlatformDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => PlatformAlertDialog(
               content: Text(
                 'Segur@ que deseas realizar esta acción?',
-                textAlign: TextAlign.center,
               ),
               actions: <Widget>[
-                FlatButton(
+                PlatformDialogAction(
                   child: Text(
                     'Si',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.lightGreen),
+                    style: TextStyle(color: Colors.lightBlue),
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
                     _resetEverything();
                   },
                 ),
-                FlatButton(
+                PlatformDialogAction(
                   child: Text(
                     'No',
-                    textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.red),
                   ),
                   onPressed: () {
@@ -171,6 +160,9 @@ class _HomePageState extends State<HomePage> {
         _totalThem -= scores[index][0];
         _totalUs -= scores[index][1];
         scores.removeAt(index);
+        if (_totalThem <= 200 && _totalUs <= 200) {
+          _isButtonDisabled = false;
+        }
       });
     });
   }
@@ -184,7 +176,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).backgroundColor,
       resizeToAvoidBottomPadding: false,
       body: Container(
         padding: EdgeInsets.only(top: 50),
@@ -197,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                   bottomLeft: Radius.circular(50),
                   bottomRight: Radius.circular(50),
                 ),
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -214,24 +206,30 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Text(
                         'Ellos',
-                        style: TextStyle(fontSize: 25, color: Colors.black),
+                        style: Theme.of(context).textTheme.title,
                       ),
                       Text(
                         _totalThem.toString(),
-                        style: TextStyle(fontSize: 20, color: Colors.black),
+                        style: Theme.of(context).textTheme.subtitle,
                       ),
                     ],
+                  ),
+                  Container(
+                    child: Text(
+                      'VS',
+                      style: TextStyle(color: Colors.red, fontSize: 20),
+                    ),
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       Text(
                         'Nosotros',
-                        style: TextStyle(fontSize: 25, color: Colors.black),
+                        style: Theme.of(context).textTheme.title,
                       ),
                       Text(
                         _totalUs.toString(),
-                        style: TextStyle(fontSize: 20, color: Colors.black),
+                        style: Theme.of(context).textTheme.subtitle,
                       ),
                     ],
                   ),
@@ -253,15 +251,7 @@ class _HomePageState extends State<HomePage> {
                           child: TextField(
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              hintText: 'Ellos',
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.black, width: 0.5),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.blueAccent, width: 0.5),
-                              ),
+                              hintText: '0',
                             ),
                             keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
@@ -276,15 +266,7 @@ class _HomePageState extends State<HomePage> {
                           child: TextField(
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              hintText: 'Nosotros',
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.black, width: 0.5),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.blueAccent, width: 0.5),
-                              ),
+                              hintText: '0',
                             ),
                             keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
@@ -303,7 +285,7 @@ class _HomePageState extends State<HomePage> {
                           height: 50,
                           child: RaisedButton(
                             disabledColor: Colors.grey,
-                            color: Colors.lightGreen,
+                            color: Theme.of(context).buttonColor,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: <Widget>[
@@ -396,12 +378,14 @@ class _HomePageState extends State<HomePage> {
                                         VerticalDivider(),
                                         Text(
                                           '${scores[index][0]}',
-                                          style: TextStyle(color: Colors.black),
+                                          style:
+                                              Theme.of(context).textTheme.body1,
                                         ),
                                         VerticalDivider(),
                                         Text(
                                           '${scores[index][1]}',
-                                          style: TextStyle(color: Colors.black),
+                                          style:
+                                              Theme.of(context).textTheme.body1,
                                         ),
                                         VerticalDivider(),
                                         IconButton(
